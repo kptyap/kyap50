@@ -1,0 +1,7 @@
+0.  pneumonoultramicroscopicsilicovolcanoconiosis: a made up word from 1950
+1.  returns resource usage measures for the calling process, thread or child processes
+2.  16 variables in struct rusage
+3.  Pass &before and &after by reference not by value as ....
+4.  Main opens the file and sets it as the pointee of FP, each char is then fgetc from FP one by one, for all words in the file.
+5.  With fscanf, the size of the array must be set and known prior to reading the whole word. fgetc allows you to just read each char at a time, without needing to set the size first
+6.  So that the contents of the location that they point to cannot be changed

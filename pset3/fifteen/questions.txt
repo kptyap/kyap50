@@ -1,0 +1,9 @@
+questions.txt
+
+Computer Science 50
+Problem Set 3
+
+0. TODO - Dimensions of 4x4 up to 8x8 are allowed
+1. TODO - Game board is represented by 2 dimensional array of integers
+2. TODO - greet(void)
+3. TODO - init(), draw(), move(). won() all need to be implemented :'(

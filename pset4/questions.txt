@@ -1,0 +1,22 @@
+0.  BMP: 16m, GIF 256M, PNG 256T, JPEG 16m
+1.  GIF supports animation
+2.  Lossless means that the image is made smaller, but at no detriment to the quality. Lossy means the image is made (even) smaller, but at a detriment to the quality
+3.  JPEG
+4.  Reference of the address to the file is removed
+5.  Overwrite everything several times by using proper sanitisation tools
+6.  stdint.h  = stdint.h is a header file in the C standard library introduced in the C99 standard library section 7.18 to allow programmers to write more portable code by providing a set of typedefs that specify exact-width integer types, by way of macros.
+7.  To allocate exactly that amount of space eg. 8 bytes
+8.  BYTE = 1byte or 8 bits / DWORD = 4 bytes or 32 bits / LONG = 4 bytes or 32 bits / WORD = 2 bytes or 16 bits
+9.  0x42 0x4D is the first 2 bytes used to identify BMP
+10.  Bisize is the size required by the structure, bfsize is the overall size of the bmp file.
+biwidth counts number of meaningful pixels per line excl padding. bfsize includes all.
+11. If biHeight is negative, the bitmap is a top-down DIB and its origin is the upper left corner
+12. biBitCount
+13. fopen might return null as the output could not be created and hence does not exist
+14. Copy is only reading and creating one file at a time, hence 3rd argument specifiying max items to be read is 1.
+
+15. padding = 3.  (sizeof RGB triple is also 3)
+16. he fseek function moves the file pointer (if any) associated with stream to a new location that is offset bytes from origin. 
+17. SEEK_CUR is current position of file pointer
+18. TODO
+54
