@@ -1,5 +1,5 @@
  /**
- * Implements a spell-checker.
+ * Implements a spell-checker using a Trie Structure
  */
 
 #include <ctype.h>
