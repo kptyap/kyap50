@@ -1,5 +1,6 @@
 /**
- * Implements a dictionary's functionality.
+ * Implements a dictionary using a trie structure
+ * By Kyap 2017
  */
 
 #include <stdio.h>
@@ -7,6 +8,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include "dictionary.h"
+#include <string.h>
 
 //create the structure for a node, which will form part of a trie
 typedef struct node
@@ -17,7 +19,10 @@ typedef struct node
 node;
 
 //initialise the root node
-node* root;
+node *root;
+
+//initialise counter_nodes
+int counter_nodes = 0;
 
 //returns index of letter within the trie array
 int GetIndex (c)
@@ -33,8 +38,37 @@ int GetIndex (c)
  */
 bool check(const char *word)
 {
-    // TODO
-    return false;
+    //initialise cursor at root node...this seems familiar
+    node *cursor = root;
+
+    //for each letter in input word 
+    for(int i = 0, n = strlen(word); i < n; i++) //OPTIMISE: can we use null terminator instead of string len
+    {
+        int index = GetIndex(word[i]);
+        
+        //if the next letter does not exist in our dictionary, then word is mispelt
+        if (cursor->children[index] == NULL)
+        {
+            return 1;
+        }
+        
+        //if next letter exists, follow it to the next node
+        else if (cursor->children[index] != NULL)
+        {
+            cursor = cursor->children[index];
+        }
+    }
+    
+    //assuming we have reach End of input word and all letters exist
+    //check if it is actually a word in the dictionary
+    if (cursor->is_word == true)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 /**
@@ -46,17 +80,12 @@ bool load(const char *dictionary)
     root = malloc(sizeof(node));
     
     // Set a pointer of type node called cursor to root
-    node* cursor = root; 
+    node *cursor = root; 
     
-    // Initialise counter of nodes
-    int counter_nodes = 0; 
-    
-    // try to open dictionary
-    char *dick = "~/workspace/pset5/speller/dictionaries/small.txt";  
-    FILE *fp = fopen(dick, "r");
+    // try to open dictionary (location referenced in speller.c)
+    FILE *fp = fopen(dictionary, "r");
     if (fp == NULL)
     {
-        printf("Could not open %s.\n", dick);
         unload();
         return 1;
     }
@@ -71,7 +100,7 @@ bool load(const char *dictionary)
         if (isalpha(c) || (c == '\'' && index > 0))
         {
             //does a node containing that letter exist?
-            if (cursor->children[index] == NULL)
+            if (cursor->children[index] == NULL) //Conditional jump or move depends on uninitialised value(s)
             {
                 //if it does not, create a new node
                 cursor->children[index] = malloc(sizeof(node));
@@ -109,10 +138,13 @@ bool load(const char *dictionary)
         }
         //if not an alphabetical character, apostrophe or newline
         else
+        {
             printf("unrecognised character in dictionary text.\n");
             return 1;
-        
+        }
     }    
+    //release the memory held by cursor
+    fclose(fp);
     return true;
 }
 
@@ -121,15 +153,44 @@ bool load(const char *dictionary)
  */
 unsigned int size(void)
 {
-    // TODO
-    return 0;
+    //if dictionary is not loaded
+    if (!&load)
+    {
+        return 1;
+    }
+    
+    //else return number of nodes we counted in load
+    else
+    {
+        return counter_nodes;
+    }
 }
 
+/**
+ * Helper function for unload - recursive free
+ */
+bool recursivefree (node *ptr)
+    {
+        for (int i = 0; i < 27; i++)
+        {
+            if (ptr->children[i] != NULL)
+            {
+                recursivefree (ptr->children[i]);
+            }
+        }
+        free(ptr);
+        return true;
+    }
+    
 /**
  * Unloads dictionary from memory. Returns true if successful else false.
  */
 bool unload(void)
 {
-    // TODO
-    return false;
+    if (recursivefree (root))
+    {
+        return 1;
+    }
+    
+    return 0;
 }

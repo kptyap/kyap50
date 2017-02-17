@@ -1,5 +1,5 @@
  /**
- * Implements a spell-checker using a Trie Structure
+ * Implements a spell-checker
  */
 
 #include <ctype.h>
@@ -19,7 +19,7 @@ double calculate(const struct rusage *b, const struct rusage *a);
 
 int main(int argc, char *argv[])
 {
-    // check for correct number of args
+    // number of arguments must be either 2 or 3
     if (argc != 2 && argc != 3)
     {
         printf("Usage: speller [dictionary] text\n");
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 
     // prepare to spell-check
     int index = 0, misspellings = 0, words = 0;
-    char word[LENGTH+1];
+    char word[LENGTH+1]; //current word to check, an array of chars of length 46
 
     // spell-check each word in text
     for (int c = fgetc(fp); c != EOF; c = fgetc(fp))
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
             index = 0;
         }
 
-        // we must have found a whole word
+        // we must have found a whole word (implies we reached a newline which is non-alphanumeric)
         else if (index > 0)
         {
             // terminate current word
