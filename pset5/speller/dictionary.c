@@ -49,7 +49,7 @@ bool check(const char *word)
         //if the next letter does not exist in our dictionary, then word is mispelt
         if (cursor->children[index] == NULL)
         {
-            return 1;
+            return false;
         }
         
         //if next letter exists, follow it to the next node
@@ -99,10 +99,10 @@ bool load(const char *dictionary)
         // allow only alphabetical characters and apostrophes
         if (isalpha(c) || (c == '\'' && index > 0))
         {
-            //does a node containing that letter exist?
+            //does a node containing that character exist?
             if (cursor->children[index] == NULL) //Conditional jump or move depends on uninitialised value(s)
             {
-                //if it does not, create a new node
+                //if it does not, create a new node for that character
                 cursor->children[index] = malloc(sizeof(node));
                 
                 //malloc error checking
