@@ -42,7 +42,7 @@ bool check(const char *word)
     node *cursor = root;
 
     //for each letter in input word 
-    for(int i = 0, n = strlen(word); i < n; i++) //OPTIMISE: can we use null terminator instead of string len
+    for (int i = 0; word[i] != '\0'; i++) //Use of nul rather than strlen
     {
         int index = GetIndex(word[i]);
         
