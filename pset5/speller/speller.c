@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
             index = 0;
         }
 
-        // we must have found a whole word (implies we reached a newline which is non-alphanumeric)
+        // we must have found a whole word (implies we reached a newline or space which is non-alphanumeric)
         else if (index > 0)
         {
             // terminate current word
