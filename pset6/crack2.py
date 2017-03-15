@@ -26,7 +26,7 @@ while True:
 #we know the key is limited to 4 alphabetical letters
 #cycle through all possibilities of the key till we match the hash
 
-result = "fail"
+result = "fail" #default result
 
 for letter1 in string.ascii_letters:
     if(crypt.crypt(letter1, "50") == hash):
