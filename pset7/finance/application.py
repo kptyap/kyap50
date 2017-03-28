@@ -4,6 +4,7 @@ from flask_session import Session
 from passlib.apps import custom_app_context as pwd_context
 from passlib.hash import bcrypt
 from tempfile import gettempdir
+from decimal import *
 
 from helpers import *
 
@@ -34,13 +35,106 @@ db = SQL("sqlite:///finance.db")
 @app.route("/")
 @login_required
 def index():
-    return apology("TODO")
-
+    
+    #query user's current cash position
+    dict_list_cash = db.execute("SELECT cash FROM users WHERE id =:id", id=session.get("user_id"))
+    
+    #error handle if cash is zero
+    if (dict_list_cash[0]['cash']) is None:
+        cash = 0
+    else:
+        #convert to currency friendly format
+        cash = Decimal(dict_list_cash[0]['cash']).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+    
+    #query user's current stocks and all details
+    dict_list_stocks = db.execute("SELECT symbol, price, shares, name, total FROM holdings WHERE user_id =:id", id=session.get("user_id"))
+    
+    #sum cash and stock to display total
+    dict_list_sum = db.execute("SELECT SUM (total) AS total_shares FROM holdings WHERE user_id =:id", id=session.get("user_id"))
+    if (dict_list_sum[0]['total_shares']) is None:
+        sum_stocks = 0
+    else:
+        sum_stocks = Decimal(dict_list_sum[0]['total_shares']).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+    
+    grand_total = cash + sum_stocks
+    
+    
+    return render_template("index.html", grand_total=grand_total, dict_list_stocks=dict_list_stocks, cash=cash) 
+    
+    
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
-    """Buy shares of stock."""
-    return apology("TODO")
+    if request.method == "POST":
+        
+        # ensure username was submitted
+        if not request.form.get("symbol"):
+            return apology("Please provide a stock symbol on which to buy")
+    
+        # query stock symbol to check if stock exists 
+        if not lookup(request.form.get("symbol")):
+            return apology("Stock does not exist, try a different symbol")
+        else:
+            stock = lookup(request.form.get("symbol"))
+            name = stock["name"]
+            price = Decimal(stock["price"])
+            symbol = stock["symbol"]
+            
+        if not request.form.get("shares"):
+            return apology("Please enter the number of shares you wish to buy")
+            
+            #error handle if shares is not an integer
+        if not int(request.form.get("shares")):
+            return apology("Invalid shares")
+        
+        else:
+         #select amount of cash user currently has - this is returned as a list of dicts
+            dict_list = db.execute("SELECT cash FROM users WHERE id =:id", id=session.get("user_id"))
+            
+            #select the first amount from the list of dicts that was returned - http://stackoverflow.com/questions/17585898
+            if (dict_list[0]['cash']) is None:
+                cash = 0
+            else:
+                cash = Decimal(dict_list[0]['cash'])
+         
+            #calculate cost of purchase
+            shares = request.form.get("shares")
+            cost = price * Decimal(shares)
+            cashremain = Decimal(cash) - Decimal(cost)
+         
+            #return error if cash insufficient
+            if (cash - cost) < 0:
+                return apology("Insufficient cash mate")
+                
+            else:
+                #if successful, add stock purchase to transactions table
+                db.execute("INSERT INTO transactions (type, symbol, shares, price, user_id) VALUES('buy', :symbol, :shares, :price, :user_id)", symbol=symbol, shares=shares, price=price, user_id=session.get("user_id"))
+                
+                #then update user's holdings table
+                #if user already has this stock
+                rows = db.execute("SELECT symbol, shares FROM holdings WHERE user_id = :id AND symbol = :symbol", id=session.get("user_id"), symbol=symbol)
+                if len(rows) > 0:
+                    #then add some more
+                    new_shares = Decimal(shares) + Decimal(s[0]['shares'])
+                    new_total = Decimal(new_shares) * price
+                    if new_total is not None:
+                        new_total = Decimal(new_total).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+                        
+                    db.execute("UPDATE holdings SET shares =:new_shares, total =:new_total WHERE user_id =:id AND symbol = :symbol", new_shares=new_shares, new_total=new_total, id=session.get("user_id"), symbol=symbol)
+                
+                #else create a new holding
+                else:
+                    total = Decimal(cost).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+                    db.execute("INSERT INTO holdings VALUES(:symbol, :price, :shares, :user_id, :name, :total)",  symbol=symbol, price=price, shares=shares, user_id=session.get("user_id"), name=name, total=total)
+                
+                #then minus amount of cash by cost of purchase
+                db.execute("UPDATE users SET cash =:cash WHERE id =:id", cash=cashremain, id=session.get("user_id"))
+                
+                return redirect(url_for("index"))
+
+    # else if user reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("buy.html") 
 
 @app.route("/history")
 @login_required
@@ -67,7 +161,7 @@ def login():
             return apology("must provide password")
 
         # query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
+        rows = db.execute("SELECT * FROM users WHERE username =:username", username=request.form.get("username"))
 
         # ensure username exists and password is correct
         if len(rows) != 1 or not pwd_context.verify(request.form.get("password"), rows[0]["hash"]):
@@ -89,16 +183,36 @@ def logout():
 
     # forget any user_id
     session.clear()
-
+ 
     # redirect user to login form
     return redirect(url_for("login"))
 
 @app.route("/quote", methods=["GET", "POST"])
 @login_required
 def quote():
-    """Get stock quote."""
-    return apology("TODO")
-
+    if request.method == "POST":
+        
+        # ensure username was submitted
+        if not request.form.get("symbol"):
+            return apology("Please provide a stock symbol to quote on")
+    
+        # query stock symbol to check if stock exists 
+        if not lookup(request.form.get("symbol")):
+            return apology("Stock does not exist, try a different symbol")
+            
+        #if it does, lookup the stock information, return and display it    
+        else:
+            stock = lookup(request.form.get("symbol"))
+            name = stock["name"]
+            price = Decimal(stock["price"])
+            symbol = stock["symbol"]
+            
+            return render_template("quoted.html", name=name, price=price, symbol=symbol)
+    
+    # else if user reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("quote.html")   
+    
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register user."""
@@ -118,7 +232,7 @@ def register():
         elif not request.form.get("confirm_password"):
             return apology("must confirm password")
         elif (request.form.get("confirm_password") != request.form.get("password")):
-            return apology("passwords must match!")s
+            return apology("passwords must match!")
             
         # query database for username to check if username exists 
         rows = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
@@ -129,11 +243,8 @@ def register():
         db.execute("INSERT INTO users (username, hash) VALUES(:username, :hash)", username=request.form["username"], hash=pwd_context.encrypt(request.form["password"]))
         
         # then log user in automatically
-#        session["user_id"] = rows[0]["id"]
         return redirect(url_for("index"))
         
-    
-    
     # else if user reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
@@ -142,5 +253,62 @@ def register():
 @app.route("/sell", methods=["GET", "POST"])
 @login_required
 def sell():
-    """Sell shares of stock."""
-    return apology("TODO")
+    if request.method == "POST":
+        
+        # ensure username was submitted
+        if not request.form.get("symbol"):
+            return apology("Please provide a stock symbol on which to sell")
+    
+        # query stock symbol to check if stock exists 
+        if not lookup(request.form.get("symbol")):
+            return apology("Stock does not exist, try a different symbol")
+        else:
+            stock = lookup(request.form.get("symbol"))
+            name = stock["name"]
+            price = Decimal(stock["price"])
+            symbol = stock["symbol"]
+            
+        if not request.form.get("shares"):
+            return apology("Please enter the number of shares you wish to sell")
+            
+        #error handle if shares is not an integer
+        if not int(request.form.get("shares")):
+            return apology("Invalid shares")
+
+        #query holdings to determine if sufficient number of shares to sell
+        rows = db.execute("SELECT shares FROM holdings WHERE user_id =:id AND symbol =:symbol", symbol=symbol, id=session.get("user_id"))
+        if len(rows)<1:
+            return apology("You don't have any shares of this company!")
+        
+        #calculate holdings after sale
+        shares = (rows[0]['shares'])   
+        sell_shares = int(request.form.get("shares"))
+        new_shares = shares - sell_shares
+        new_total = new_shares * price
+        
+        if new_shares < 0:
+            return apology("You don't have enough shares for the amount you wish to sell")
+        
+        #select amount of cash user currently has
+        dict_list = db.execute("SELECT cash FROM users WHERE id =:id", id=session.get("user_id"))
+        if (dict_list[0]['cash']) is None:
+            cash = 0
+        else:
+            cash = Decimal(dict_list[0]['cash'])
+         
+        #calculate cash after sale
+        earnings = price * Decimal(shares)
+        cashafter = Decimal(cash) + Decimal(earnings)
+        
+        #at this point sale is successful so update cash, transaction list and holdings
+        db.execute("UPDATE users SET cash =:cash WHERE id =:id", cash=cashafter, id=session.get("user_id"))
+        db.execute("INSERT INTO transactions (type, symbol, shares, price, user_id) VALUES('sell', :symbol, :shares, :price, :user_id)", symbol=symbol, shares=shares, price=price, user_id=session.get("user_id"))
+        if new_shares == 0:
+            db.execute("DELETE FROM holdings WHERE user_id =:id AND symbol =:symbol", symbol=symbol, id=session.get("user_id"))
+        else:
+            db.execute("UPDATE holdings SET shares =:new_shares, total =:new_total WHERE user_id =:id AND symbol = :symbol", new_shares=new_shares, new_total=new_total, id=session.get("user_id"), symbol=symbol)
+        
+        return redirect(url_for("index"))
+        
+    else:
+        return render_template("sell.html") 

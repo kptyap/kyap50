@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    index
+{% endblock %}
+
+{% block main %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Symbol</th>
+                <th>Name</th>
+                <th>Shares</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tfoot> 
+            <tr>
+                <td colspan="4"></td>
+                <td><b>${{ grand_total }}</b></td>
+            </tr>
+        </tfoot>
+        <tbody>
+            {% for d in dict_list_stocks %}
+                <tr>
+                    <td>{{ d.symbol }}</td>
+                    <td>{{ d.name }}</td>
+                    <td>{{ d.shares }}</td>
+                    <td>${{ d.price }}</td>
+                    <td>${{ d.total }}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td>CASH</td>
+                <td colspan="3"></td>
+                <td>${{ cash }}</td>            
+            </tr>
+        </tbody>        
+        
+    </table>
+    
+    
+{% endblock %}
