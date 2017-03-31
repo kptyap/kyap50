@@ -112,7 +112,7 @@ def buy():
                 
                 #then update user's holdings table
                 #if user already has this stock
-                rows = db.execute("SELECT symbol, shares FROM holdings WHERE user_id = :id AND symbol = :symbol", id=session.get("user_id"), symbol=symbol)
+                rows = db.execute("SELECT symbol, shares FROM holdings WHERE user_id =:id AND symbol =:symbol", id=session.get("user_id"), symbol=symbol)
                 if len(rows) > 0:
                     #then add some more
                     new_shares = Decimal(shares) + Decimal(s[0]['shares'])
@@ -140,7 +140,10 @@ def buy():
 @login_required
 def history():
     """Show history of transactions."""
-    return apology("TODO")
+    dict_list_transactions = db.execute("SELECT tran_id, type, symbol, shares, price, date_time FROM transactions WHERE user_id =:id", id=session.get("user_id"))
+    
+    return render_template("history.html", dict_list_transactions=dict_list_transactions) 
+    
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
