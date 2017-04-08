@@ -25,6 +25,7 @@ while True:
 #we know the salt is the 2-digit '50'
 #we know the key is limited to 4 alphabetical letters
 #cycle through all possibilities of the key till we match the hash
+#credit to http://stackoverflow.com/questions/42673561/iterate-through-multiple-lists-of-characters-in-order
 
 result = "fail" #default result
 

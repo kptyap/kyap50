@@ -2,7 +2,7 @@
  * fifteen.c
  *
  * Computer Science 50
- * Problem Set 3 by Ka1Zn
+ * Problem Set 3 by K.Yap
  *
  * Implements Game of Fifteen (generalized to d x d).
  *
