@@ -78,18 +78,26 @@ function addMarker(place)
         icon: icon, //customise icon lol
         map: map
     });
-   
+    
     // Create an info window
-    var infowindow = new google.maps.InfoWindow({
-        content:  'pp0' 
-           
-    });
-            
+    var infowindow = new google.maps.InfoWindow();
+    
     marker.addListener('click', function() {
-        infowindow.open(map, marker);
-  
+    infowindow.setContent('shit');
+        
+    
+    
+    
+    
+        
+    infowindow.open(map, marker);
     });
 }
+
+        
+     
+
+    
 
 /**
  * Configures application.
