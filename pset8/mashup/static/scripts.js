@@ -63,12 +63,10 @@ $(function() {
  */
 function addMarker(place)
 {
-    icon = "http://maps.google.com/mapfiles/kml/pal3/icon52.png";
+    icon = "https://maps.google.com/mapfiles/kml/pal3/icon52.png";
     
     // What is the current map canvas showing?
     var mylatlng = new google.maps.LatLng(parseFloat(place.latitude), parseFloat(place.longitude));
-    
-    var articles_url = '/articles?geo=' + place.postal_code;
     
     // For the current Map canvas, place a marker with place_name, admin_name1
     var marker = new google.maps.Marker({
@@ -79,26 +77,32 @@ function addMarker(place)
         map: map
     });
     
-    // Create an info window
-    var infowindow = new google.maps.InfoWindow();
-    
     marker.addListener('click', function() {
-    infowindow.setContent('shit');
+    
+        var artlist = '<div id="artlist"><ul>';
+    
+        $.getJSON(Flask.url_for("articles"), {geo:place.postal_code})
+            .done(function(data, textStatus, jqXHR) { 
+                $.each(data, function(i, article) { //call each object within the JSON array
+                    $('<li><a href="'+article.link+'" target="_blank">'+article.title+'</a></li>').appendTo('#artlist'); 
+                
+                
+                });
+            })
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                console.log(errorThrown.toString());
+            }); 
         
-    
-    
-    
-    
+            '</ul>';
+            
+                        
+        showInfo(marker, artlist );
         
-    infowindow.open(map, marker);
     });
 }
 
         
      
-
-    
-
 /**
  * Configures application.
  */
