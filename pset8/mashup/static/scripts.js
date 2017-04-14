@@ -63,30 +63,43 @@ $(function() {
  */
 function addMarker(place)
 {
-    icon = "https://maps.google.com/mapfiles/kml/pal3/icon52.png";
-    
     // What is the current map canvas showing?
     var mylatlng = new google.maps.LatLng(parseFloat(place.latitude), parseFloat(place.longitude));
     
-    // For the current Map canvas, place a marker with place_name, admin_name1
+    // For the current Map canvas, add markers from places, and push to array
     var marker = new google.maps.Marker({
         
         position: mylatlng, //pull latlng
         title: place.place_name, //pull title from place
-        icon: icon, //customise icon lol
+        icon: {
+            url: "http://maps.google.com/mapfiles/kml/pal3/icon47.png",
+            labelOrigin: new google.maps.Point(15, 0)
+        },
+        label: place.place_name,
         map: map
     });
+    // Add marker to the markers array
+    markers.push(marker);
     
     marker.addListener('click', function() {
-    
+        
+        // Create an empty div which will be populated with articles
         var artlist = '<div id="artlist"><ul>';
-    
+        
+        // Call the JSON array of articles
         $.getJSON(Flask.url_for("articles"), {geo:place.postal_code})
-            .done(function(data, textStatus, jqXHR) { 
-                $.each(data, function(i, article) { //call each object within the JSON array
-                    $('<li><a href="'+article.link+'" target="_blank">'+article.title+'</a></li>').appendTo('#artlist'); 
+            .done(function(data, textStatus, jqXHR) {
+                if (data.length == 0)
+                    $('#artlist').html('There are currently no news articles for this location');
                 
-                
+                    // Call each object within the JSON array
+                    $.each(data, function(i, article) {
+                        
+                        // AppendTo the div each article, using HTML
+                        $('<li><a href="'+article.link+'" target="_blank">'+article.title+'</a></li>').appendTo('#artlist');
+                        
+                        // Max number of articles - http://stackoverflow.com/questions/12648063/how-to-limit-an-each-loop-on-json-data-in-jquery
+                        return i<7;
                 });
             })
             .fail(function(jqXHR, textStatus, errorThrown) {
@@ -94,8 +107,7 @@ function addMarker(place)
             }); 
         
             '</ul>';
-            
-                        
+        // Populate the infowindow
         showInfo(marker, artlist );
         
     });
@@ -177,7 +189,13 @@ function configure()
  */
 function removeMarkers()
 {
-    // TODO
+    // Remove markers from map by calling setMap and setting to null
+    for (i = 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+    }
+    
+    //Delete all markers in array by removing references to them
+    markers = [];
 }
 
 /**
