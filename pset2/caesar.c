@@ -21,12 +21,14 @@ int main(int argc, string argv[])
     // TIP: no need 'else' after the IF statement
     int k = atoi(argv[1]);
     
-    string p = GetString();
+    printf("plaintext:  ");
+    string p = get_string();
     if (p == NULL)
     {
         return 1;
     }
     
+    printf("ciphertext: ");
     for (int i = 0, n = strlen(p); i < n; i++)
     {
         if isalpha (p[i])

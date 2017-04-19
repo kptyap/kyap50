@@ -31,13 +31,15 @@ int main(int argc, string argv[])
     }
     
 //ask for a string P that will be encrypted
-    string p = GetString();
+    printf("plaintext: ");
+    string p = get_string();
     if (p == NULL)
     {
         return 1;
     }
 
 //encrypt each letter in P using each letter in k
+  printf("ciphertext: ");
   int h = 0;
   int i = 0;
   int j = 0;
@@ -56,14 +58,16 @@ int main(int argc, string argv[])
             {
                 printf("%c", ((p[i] - 97 + (tolower(k[j])-97))%26 + 97));
             }
-        h++;
+            
+            h++;
         }
         else if isprint (p[i])
         {
            printf("%c", p[i]);
         }
-    i++;
-    j = h % m; //TIP: use modulo to wrap back around
+        
+        i++;
+        j = h % m; //TIP: use modulo to wrap back around
     }
     printf("\n");
     return 0;
