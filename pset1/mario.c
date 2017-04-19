@@ -12,8 +12,8 @@ int main(void)
     int height; //declare the variable before the do loop
     do // use a do loop as the check that user input is in the specified range
     {
-    printf("Height:");  //ask for user input
-    height = GetInt();
+        printf("Height: ");  //ask for user input
+        height = get_int();
     }
     while (height <0 || height >23); //check to make sure input is within 0-23 otherwise ask height again
     

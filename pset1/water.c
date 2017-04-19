@@ -3,10 +3,10 @@
 
 int main(void) {
     //ask user how long is shower?
-    printf("How many minutes do you shower for?");
-    int minutes = GetInt();
+    printf("Minutes: ");
+    int minutes = get_int();
     int bott = minutes*12;
     //multiply minutes of shower by bottles of water used
 
-    printf("bottles: %i \n", bott);
+    printf("Bottles: %i \n", bott);
 } 

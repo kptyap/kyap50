@@ -14,7 +14,7 @@ int main(void)
     do
     {
         printf("How much $$ are you owed?");
-        amnt = GetFloat();
+        amnt = get_float();
     }
     while (amnt < 0);
     
