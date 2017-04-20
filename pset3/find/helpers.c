@@ -16,26 +16,27 @@
 /**
  * Returns true if value is in array of n values, else false.
  */
-bool search(int value, int values[], int n) //**Binary Search by Ka1Zn**
+bool search(int value, int values[], int s) //**Binary Search by Kyap**
 {
-    int min = 0;
-    int max = n;
-    int mid = round(min + max)/2;
+    int low = 0;
+    int high = s;
+    int mid = round((low + high) / 2); //Note the midpoint formula
     
-    while (max > min) //while you have not found the value
-    {
+    while (high >= low) //while you have not found the value
+    {   
+        mid = round((low + high) / 2);
+        
         if (value < values[mid]) //if value is smaller than midpoint
         {
-            max = values[mid]; //look in the left half and adjust max boundary
-            mid = round(min + max)/2;
+            high = mid - 1; //look in the left half and adjust max boundary
         }  
+        
         else if (value > values[mid])  //if value is larger than midpoint
         {
-            min = values[mid]; //look in the right half and adjust min boundary
-            mid = round(min + max)/2;
+            low = mid + 1; //look in the right half and adjust min boundary
         }
         else
-                return true; //else that means midpoint must be what we are looking for
+            return true; //else that means midpoint must be what we are looking for
     }
         return false;
 }
@@ -65,7 +66,7 @@ void sort(int values[], int n)
     while (swapcounter > 0); 
     
     for (int i = 0; i < n; i++)
-    printf("%d\n",values[i]);
+        printf("%d\n",values[i]);
         
     return;
 }

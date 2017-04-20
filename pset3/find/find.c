@@ -27,7 +27,7 @@ int main(int argc, string argv[])
     if (argc != 2)
     {
         printf("Usage: ./find needle\n");
-        return -1;
+        return 1;
     }
 
     // remember needle
@@ -40,7 +40,7 @@ int main(int argc, string argv[])
     {
         // wait for hay until EOF
         printf("\nhaystack[%i] = ", size);
-        int straw = GetInt();
+        int straw = get_int();
         if (straw == INT_MAX)
         {
             break;
