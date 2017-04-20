@@ -105,7 +105,7 @@ int main(int argc, string argv[])
 
         // prompt for move
         printf("Tile to move: ");
-        int tile = GetInt();
+        int tile = get_int();
         
         // quit if user inputs 0 (for testing)
         if (tile == 0)
@@ -151,7 +151,7 @@ void greet(void)
 {
     clear();
     printf("WELCOME TO GAME OF FIFTEEN\n");
-    usleep(20000);
+    usleep(1000000);
 }
 
 /**
@@ -241,51 +241,7 @@ bool won(void)
             return true;
       }
    }
-   return true;
-}
-
-/**
- * code dumping ground *
- * 
- * bool move(int tile)
-{
-   for (int i = 0; i < d; i++) 
-   {    
-      for (int j = 0; j < d; j++)
-      {
-         if (tile == board[i][j]) //1. Get corresponding coordinates of tile trying to be moved
-         {   
-           if (board[i+1][j] == 0)
-           {
-              board[i+1][j] = tile;
-              board[i][j] = 0;
-              return true;
-           }
-           else if (board[i-1][j] == 0)
-           {
-              board[i-1][j] = tile;
-              board[i][j] = 0;
-              return true;
-           }
-           else if(board[i][j+1] == 0)
-           {
-              board[i][j+1] = tile;
-              board[i][j] = 0;
-              return true;
-           }
-           else if (board[i][j-1] == 0)
-           {
-              board[i][j-1] = tile;
-              board[i][j] = 0;
-              return true;
-           }
-           else
-              return false;
-           return false;
-                    break;
-          }
-        }
-   }
    return false;
 }
-**/
+
+
