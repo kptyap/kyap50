@@ -11,58 +11,45 @@ import string
 while True:
     try:
         hash = str(sys.argv[1])
-    except ValueError:
+    except (ValueError, IndexError) as e:  #Multiple exceptions: http://stackoverflow.com/questions/6470428/catch-multiple-exceptions-in-one-line-except-block
         print("Please enter a hash")
         break
+        
     if (len(hash) != 13):
         print("Hash must be of length 13")
         break
     else:
         break
-# TODO: need to account for no arg entered
     
 
 #we know the salt is the 2-digit '50'
 #we know the key is limited to 4 alphabetical letters
 #cycle through all possibilities of the key till we match the hash
+#credit to http://stackoverflow.com/questions/42673561/iterate-through-multiple-lists-of-characters-in-order
 
-letters = string.ascii_letters
-lcounter = 0
-i = 0
-j = 0
-k = 0
-l = 0
-tryhash = "a"
-word = [letters[i]]
+result = "fail" #default result
 
-while(tryhash != hash):
-    for c in letters:
-        word = [letters[i]]
-        tryword = ''.join(word)
-        tryhash = crypt.crypt(tryword, "50")
+for letter1 in string.ascii_letters:
+    if(crypt.crypt(letter1, "50") == hash):
+        print(letter1)
+        result = "success"
+        break
         
-        if (tryhash == hash):
-            print(word)
+    for letter2 in string.ascii_letters:
+        if(crypt.crypt(letter1+letter2, "50") == hash):
+            print(letter1+letter2)
+            result = "success"
             break
             
-        i += 1
-        
-        if (lcounter > 0) and (i == 52):
-            i = 0
-            if (lcounter == 1) and (j == 0):
-                word.insert(lcounter, letters[j])
-            j += 1
-           
-            if (lcounter > 1) and (k == 52):
-                j = 0
-                if (lcounter == 2) and (k == 0):
-                    word.insert(lcounter, letters[k])
-                k += 1
+        for letter3 in string.ascii_letters:
+            if(crypt.crypt(letter1+letter2+letter3, "50") == hash):
+                print(letter1+letter2+letter3)
+                result = "success"
+                break
                 
-                if (lcounter > 2) and (k == 52):
-                    k = 0
-                    if (lcounter == 3) and (l == 0):
-                        word.insert(lcounter, letters[l])
-                    l += 1
-        
-    lcounter += 1
+            for letter4 in string.ascii_letters:
+                if(crypt.crypt(letter1+letter2+letter3+letter4, "50") == hash):
+                    print(letter1+letter2+letter3+letter4)
+                    result = "success"
+                    break
+print(result)
