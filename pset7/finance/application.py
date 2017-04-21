@@ -314,4 +314,43 @@ def sell():
         return redirect(url_for("index"))
         
     else:
-        return render_template("sell.html") 
+        return render_template("sell.html")
+        
+        
+@app.route("/account", methods=["GET", "POST"])
+@login_required
+def account():
+    
+    if request.method == "POST":
+
+        # ensure fields are submitted
+        if not request.form.get("curr_password"):
+            return apology("plz provide current password")
+            
+        if not request.form.get("new_password"):
+            return apology("plz provide new password")
+            
+        # ensure confirm password was submitted and matches
+        elif not request.form.get("confirm_new_password"):
+            return apology("must confirm new password")
+        elif (request.form.get("confirm_new_password") != request.form.get("new_password")):
+            return apology("new passwords must match!")
+            
+        # query database for current hashed pw
+        rows = db.execute("SELECT hash FROM users WHERE id =:id", id=session.get("user_id"))
+        if len(rows) < 1:
+            return apology("oh dear")
+            
+        # ensure current password is correct
+        if not pwd_context.verify(request.form.get("curr_password"), rows[0]["hash"]):
+            return apology("invalid username and/or password")
+            
+        # if all is well, write new hashed password to database
+        db.execute("UPDATE users SET hash =:hash WHERE id =:id", hash=pwd_context.encrypt(request.form["new_password"]), id=session.get("user_id"))
+        
+        # then log user in automatically
+        return redirect(url_for("index"))
+        
+    # else if user reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("account.html")
