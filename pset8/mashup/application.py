@@ -25,9 +25,9 @@ db = SQL("sqlite:///mashup.db")
 @app.route("/")
 def index():
     """Render map."""
-#   if not os.environ.get("API_KEY"):
-#        raise RuntimeError("API_KEY not set")
-    return render_template("index.html", key="AIzaSyB4fBkR9hjjxOORPVJCmcSifoXXWiicnqc") #os.environ.get("API_KEY")
+    if not os.environ.get("API_KEY"):
+        raise RuntimeError("API_KEY not set")
+    return render_template("index.html", key=os.environ.get("API_KEY"))
 
 @app.route("/articles")
 def articles():
